@@ -1,0 +1,24 @@
+default:
+  extensions:
+    Imbo\BehatApiExtension:
+      apiClient:
+        base_uri: http://localhost/
+        timeout: 5.0
+        verify: true
+#    Soulcodex\Behat:
+#      kernel: # Default values
+#        bootstrap_path: '/bootstrap/app.php'
+#        environment_path: '.env.behat'
+#    Behat\MinkExtension: # Default mink extension configuration
+#      default_session: laravel
+#      laravel: ~
+
+  # Your test suites here
+  suites:
+    book:
+      paths: [ '%paths.base%/tests/Feature/Book/' ]
+      # The context needed by your features tests
+      contexts:
+        - Tests\Feature\Book\BookContext: ~
+
+

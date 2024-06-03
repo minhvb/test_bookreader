@@ -1,0 +1,52 @@
+version: "3.0"
+services:
+    web:
+      image: webdevops/php-nginx:8.2
+      container_name: web
+      working_dir: /app
+      restart: always
+      user: root
+      environment:
+        - WEB_DOCUMENT_ROOT=/app/public
+        - PHP_DATE_TIMEZONE=UTC
+        - PHP_DISPLAY_ERRORS=1
+        - PHP_MEMORY_LIMIT=2048M
+        - PHP_MAX_EXECUTION_TIME=180000
+        - PHP_POST_MAX_SIZE=500M
+        - PHP_UPLOAD_MAX_FILESIZE=1024M
+      volumes:
+        - ./:/app:cached
+        - ./docker/patch:/opt/docker/patch:cached
+      ports:
+        - "8000:80"
+      depends_on:
+          - db
+    db:
+        image: mysql:8.0
+        container_name: db-mysql
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_ROOT_PASSWORD: admin
+        volumes:
+            - mysqldata:/var/lib/mysql
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.1.3
+        container_name: elasticsearch
+        volumes:
+            - elasticsearch-data:/usr/share/elasticsearch/data
+        environment:
+            - ELASTIC_PASSWORD=admin
+            - discovery.type=single-node
+            - cluster.routing.allocation.disk.threshold_enabled=false
+            - bootstrap.memory_lock=true
+            - action.destructive_requires_name=false
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ports:
+            - "9400:9200"
+volumes:
+    elasticsearch-data:
+    mysqldata:
